@@ -65,7 +65,7 @@ def getData(symbols):
     # print cleaned data
     rows = cleanData(json.loads(data))
     # write results to csv
-    directory = "poophead"
+    directory = "csv_data"
     if not os.path.exists(directory):
       os.makedirs(directory)
     filename = directory + "/" + symbols[0] + ".csv"
