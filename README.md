@@ -16,5 +16,6 @@ Program will combine all data analysis and forecasting algorithms to make optima
 
 Dependencies:
 - Python version 3.6.4
+- Anaconda3
 - Sqlite3 version 3.19.3 (2017-06-27)
 - R version 3.4.3 (2017-11-30) -- "Kite-Eating Tree"

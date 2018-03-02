@@ -1,4 +1,5 @@
 import sqlite3
+import pandas
 
 def create_connection(db_file):
   """ create a database connection to the SQLite database
@@ -25,8 +26,8 @@ def create_table(conn, create_table_sql):
 # Creates tables
 def createSqlTables():
   database = "stockInfo.db"
-  sql_create_chart_table = """CREATE TABLE IF NOT EXISTS chart (symbol text PRIMARY KEY, date text, open real, high real, low real, close real, volume integer, unadjustedVolume integer, change real, changePercent real, vwap real, label text, changeOverTime real);"""
-  sql_create_quote_table = """CREATE TABLE IF NOT EXISTS quote (symbol text PRIMARY KEY, companyName text, primaryExchange text, sector text, calculationPrice text, open real, openTime integer, close real, closeTime integer, high real, low real, latestPrice real, latestSource real, latestTime text, latestUpdate integer, latestVolume integer, iexRealtimePrice real, iexRealtimeSize real, iexLastUpdated text, delayedPrice real, delayedPriceTime integer, previousClose real, change real, changePercent real, iexMarketPercent real, iexVolume integer, avgTotalVolume integer, iexBidPrice real, iexBidSize integer, iexAskPrice real, iexAskSize real, marketCap integer, peRatio real, week52High real, week52Low real, ytdChange real, FOREIGN KEY(symbol) REFERENCES chart(symbol));"""
+  sql_create_chart_table = """CREATE TABLE IF NOT EXISTS chart (date text, open real, high real, low real, close real, volume integer, unadjustedVolume integer, change real, changePercent real, vwap real, label text, changeOverTime real, symbol text PRIMARY KEY);"""
+  sql_create_quote_table = """CREATE TABLE IF NOT EXISTS quote (symbol text, companyName text, primaryExchange text, sector text, calculationPrice text, open real, openTime integer, close real, closeTime integer, high real, low real, latestPrice real, latestSource real, latestTime text, latestUpdate integer, latestVolume integer, iexRealtimePrice real, iexRealtimeSize real, iexLastUpdated text, delayedPrice real, delayedPriceTime integer, previousClose real, change real, changePercent real, iexMarketPercent real, iexVolume integer, avgTotalVolume integer, iexBidPrice real, iexBidSize integer, iexAskPrice real, iexAskSize real, marketCap integer, peRatio real, week52High real, week52Low real, ytdChange real, FOREIGN KEY(symbol) REFERENCES chart(symbol));"""
   sql_create_stats_table = """CREATE TABLE IF NOT EXISTS stats (companyName text, marketcap integer, beta real, week52high real, week52low real, week52change real, shortInterest integer, shortDate text, dividendRate real, dividendYield real, exDividendDate text, latestEPS real, latestEPSDate text, sharesOutstanding integer, float integer, returnOnEquity real, consensusEPS real, numberOfEstimates integer, symbol text, EBITDA integer, revenue integer, grossProfit integer, cash integer, debt integer, ttmEPS real, revenuePerShare real, revenuePerEmployee real, peRatioHigh real, peRatioLow real, EPSSurpriseDollar real, EPSSurprisePercent real, returnOnAssets real, returnOnCapital real, profitMargin real, priceToSales real, priceToBook real, day200MovingAvg real, day50MovingAvg real, institutionPercent real, insiderPercent real, shortRatio real, year5ChangePercent real, year2ChangePercent real, year1ChangePercent real, ytdChangePercent real, month6ChangePercent real, month3ChangePercent real, month1ChangePercent real, day5ChangePercent real, FOREIGN KEY(symbol) REFERENCES chart(symbol));"""
   # create a database connection
   conn = create_connection(database)
@@ -38,10 +39,6 @@ def createSqlTables():
   else:
     print("Error! Cannot create the database connection.")
 
-
-
-
-
 def select_lastrow_chart(conn):
     """
     Query last row in the chart table
@@ -50,7 +47,6 @@ def select_lastrow_chart(conn):
     """
     cur = conn.cursor()
     cur.execute("SELECT * FROM chart ORDER BY date DESC LIMIT 1")
- 
     rows = cur.fetchall()
     
     return(rows)
@@ -63,8 +59,33 @@ def importLastChartRow():
   with conn:
     print("Querying last row in chart...")
     return select_lastrow_chart(conn)
+    
+def append_csv_to_Database(conn):
+    """
+    Append all new csv data to Database
+    :param conn: the Connection object
+    :return:
+    """
+    
+    df = pandas.read_csv("tempData/A/chart.csv")
+    print(df)
+    
+    df.to_sql('chart', conn, if_exists='append', index=False)
+    
+    #return(rows)
+    
+def loadAllCsvDataToDatabase():
+  database = "stockInfo.db"
+  conn = create_connection(database)
+  with conn:
+    print("Appending data to database...")
+    append_csv_to_Database(conn)
 
 
 if __name__ == "__main__":
   createSqlTables()
-  print(importLastChartRow())
+  #print(importLastChartRow())
+  #print(loadAllCsvDataToDatabase())
+  
+  #test
+  loadAllCsvDataToDatabase()

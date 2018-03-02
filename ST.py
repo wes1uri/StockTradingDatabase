@@ -1,16 +1,17 @@
 #!/usr/lib/python3.6
 
+# Run in terminal with python3.6 ST.py command
+
+# While running program, need to disable computer's auto-sleep mode bc it will 
+# disconnect from the internet and the API calls will break.
+
 import urllib.request
 import json
 import csv
 import os
 import sqlD
-from collections import defaultdict
-
 
 # https://api.iextrading.com/1.0/ref-data/symbols
-# https://api.iextrading.com/1.0/stock/market/batch?symbols=aapl,fb,tsla&types=chart
-
 # https://api.iextrading.com/1.0/stock/market/batch?symbols=aapl,fb,tsla&types=chart&range=5y
 
 
@@ -137,6 +138,9 @@ def updateChartData(symbols):
     
   else:
     print ("Received an error from server, cannot retrieve chart data " + str(webUrl.getcode()))
+    
+#def loadAllCsvDataToDatabase():
+
 
 
 if __name__ == "__main__":
@@ -151,4 +155,7 @@ if __name__ == "__main__":
     updateChartData(symbolNames[i:i+stepSize])
     getData(symbolNames[i:i+stepSize],"quote")
     getData(symbolNames[i:i+stepSize],"stats")
+    
+  #loadAllCsvDataToDatabase()
+  sqlD.loadAllCsvDataToDatabase()
     
